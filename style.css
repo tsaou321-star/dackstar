@@ -1,0 +1,1207 @@
+/* ==========================================================================
+   怪力亂神鳥嘴醫生 - 核心設計系統 (style.css)
+   風格：暗黑哥德 x 賽博科幻 (Neon Gothic-Cyberpunk)
+   ========================================================================== */
+
+:root {
+    --bg-dark: #080612;
+    --bg-card: rgba(18, 14, 38, 0.75);
+    --border-color: rgba(0, 243, 255, 0.25);
+    
+    /* 霓虹燈色 */
+    --neon-cyan: #00f3ff;
+    --neon-green: #39ff14;
+    --neon-magenta: #ff0055;
+    --neon-purple: #bd00ff;
+    --neon-yellow: #ffe600;
+    
+    /* 船隻配色 */
+    --color-thor: var(--neon-cyan);
+    --color-plague: var(--neon-purple);
+    --color-cactus: var(--neon-green);
+    --color-banknote: var(--neon-yellow);
+    
+    /* 字體 */
+    --font-primary: 'Noto Sans TC', sans-serif;
+    --font-tech: 'Orbitron', sans-serif;
+    
+    /* 陰影 */
+    --glow-cyan: 0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.2);
+    --glow-magenta: 0 0 10px rgba(255, 0, 85, 0.6), 0 0 20px rgba(255, 0, 85, 0.3);
+    --glow-green: 0 0 10px rgba(57, 255, 20, 0.5);
+    --glow-purple: 0 0 10px rgba(189, 0, 255, 0.6);
+    --glow-yellow: 0 0 10px rgba(255, 230, 0, 0.5);
+    
+    --grid-cell-size: 40px;
+}
+
+/* 基礎設定 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: #e0e0f5;
+    font-family: var(--font-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* 背景動畫特效 */
+.radar-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(18, 14, 38, 0) 0%, var(--bg-dark) 85%),
+        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+    background-position: center;
+    z-index: -3;
+}
+
+.stars-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px);
+    background-size: 550px 550px;
+    opacity: 0.15;
+    z-index: -2;
+    animation: starsMoving 120s linear infinite;
+}
+
+@keyframes starsMoving {
+    from { background-position: 0 0; }
+    to { background-position: 550px 1100px; }
+}
+
+.scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0) 50%,
+        rgba(0, 243, 255, 0.04) 50%,
+        rgba(0, 243, 255, 0.04)
+    );
+    background-size: 100% 4px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* 雷達掃描線動畫 */
+.radar-bg::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        rgba(0, 243, 255, 0.08) 0deg,
+        rgba(0, 243, 255, 0.05) 90deg,
+        rgba(0, 243, 255, 0.01) 180deg,
+        transparent 360deg
+    );
+    animation: radarSweep 10s linear infinite;
+    transform-origin: center center;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes radarSweep {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 主容器 */
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+header {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.game-title {
+    font-family: var(--font-tech);
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #ffffff;
+    text-shadow: 
+        0 0 10px var(--neon-cyan),
+        0 0 20px var(--neon-purple),
+        0 0 40px rgba(0, 243, 255, 0.3);
+    animation: titleGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    0% {
+        text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 243, 255, 0.4), 0 0 30px rgba(189, 0, 255, 0.3);
+    }
+    100% {
+        text-shadow: 0 0 15px var(--neon-purple), 0 0 30px rgba(189, 0, 255, 0.5), 0 0 50px rgba(0, 243, 255, 0.4);
+    }
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    letter-spacing: 6px;
+    color: var(--neon-cyan);
+    opacity: 0.8;
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+    margin-top: 5px;
+    font-weight: 700;
+}
+
+/* 卡片與容器樣式 */
+.card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 243, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: rgba(0, 243, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+/* 控制面板 */
+.control-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+
+select {
+    background-color: rgba(8, 6, 18, 0.9);
+    border: 1px solid var(--neon-cyan);
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    outline: none;
+    font-family: var(--font-primary);
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: inset 0 0 5px rgba(0, 243, 255, 0.2);
+    transition: all 0.3s;
+}
+
+select:focus {
+    box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+/* 按鈕設計 */
+.btn {
+    background: transparent;
+    border: 1px solid var(--neon-cyan);
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    font-weight: 900;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+    text-shadow: 0 0 5px rgba(255,255,255,0.5);
+    box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.1);
+}
+
+.btn:hover {
+    background: var(--neon-cyan);
+    color: var(--bg-dark);
+    box-shadow: var(--glow-cyan);
+    text-shadow: none;
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    border-color: var(--neon-purple);
+    box-shadow: inset 0 0 10px rgba(189, 0, 255, 0.1);
+}
+.btn-secondary:hover {
+    background: var(--neon-purple);
+    border-color: var(--neon-purple);
+    color: white;
+    box-shadow: var(--glow-purple);
+}
+
+.btn-success {
+    border-color: var(--neon-green);
+    box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.1);
+}
+.btn-success:hover {
+    background: var(--neon-green);
+    border-color: var(--neon-green);
+    color: var(--bg-dark);
+    box-shadow: var(--glow-green);
+}
+
+.btn-danger {
+    border-color: var(--neon-magenta);
+    box-shadow: inset 0 0 10px rgba(255, 0, 85, 0.1);
+}
+.btn-danger:hover {
+    background: var(--neon-magenta);
+    border-color: var(--neon-magenta);
+    color: white;
+    box-shadow: var(--glow-magenta);
+}
+
+.btn:disabled {
+    border-color: #555566;
+    color: #666677;
+    background: rgba(20, 20, 30, 0.5);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.btn-icon {
+    font-size: 1.2rem;
+    padding: 8px 12px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+/* P2P 專用狀態區 */
+.p2p-only {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: 1px dashed rgba(189, 0, 255, 0.4);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-indicator.disconnected {
+    background-color: var(--neon-magenta);
+    box-shadow: 0 0 8px var(--neon-magenta);
+}
+.status-indicator.connecting {
+    background-color: var(--neon-yellow);
+    box-shadow: 0 0 8px var(--neon-yellow);
+    animation: flash 1s infinite alternate;
+}
+.status-indicator.connected {
+    background-color: var(--neon-green);
+    box-shadow: 0 0 8px var(--neon-green);
+}
+
+#roomLinkContainer {
+    display: flex;
+    gap: 5px;
+}
+#roomLinkInput {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--neon-purple);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    width: 150px;
+}
+
+@keyframes flash {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+/* 遊戲主版面 */
+.game-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 佈署面板 */
+.setup-panel h2 {
+    color: var(--neon-cyan);
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+}
+.setup-panel .instructions {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    color: #b0afcc;
+}
+
+.ship-yard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.ship-select-card {
+    background: rgba(10, 8, 22, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 12px;
+    cursor: grab;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.ship-select-card:hover {
+    border-color: var(--neon-cyan);
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.05);
+}
+
+.ship-select-card.selected {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
+    background: rgba(0, 243, 255, 0.05);
+}
+
+.ship-select-card.placed {
+    opacity: 0.35;
+    cursor: not-allowed;
+    border-color: #333;
+    pointer-events: none;
+}
+
+.ship-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 5px;
+}
+
+.ship-name {
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+.ship-size {
+    font-family: var(--font-tech);
+    font-size: 0.75rem;
+    color: var(--neon-cyan);
+}
+
+.ship-preview {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* SVG 預覽圖背景圖樣 */
+.ship-preview svg {
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.setup-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* 棋盤對決區 */
+.boards-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.board-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.board-wrapper h3 {
+    margin-bottom: 15px;
+    font-size: 1.15rem;
+    letter-spacing: 2px;
+    color: #ffffff;
+    font-family: var(--font-tech);
+    text-transform: uppercase;
+}
+
+#playerBoard h3 {
+    color: var(--neon-cyan);
+}
+
+#enemyBoard h3 {
+    color: var(--neon-purple);
+}
+
+/* 網格與座標軸 */
+.board-header-labels {
+    display: flex;
+    width: 100%;
+}
+
+.empty-corner {
+    width: 30px;
+}
+
+.col-labels {
+    display: grid;
+    grid-template-columns: repeat(10, var(--grid-cell-size));
+    width: calc(10 * var(--grid-cell-size));
+}
+
+.col-label {
+    width: var(--grid-cell-size);
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-tech);
+    font-size: 0.85rem;
+    color: #8888aa;
+    font-weight: 700;
+}
+
+.board-body {
+    display: flex;
+}
+
+.row-labels {
+    display: grid;
+    grid-template-rows: repeat(10, var(--grid-cell-size));
+    height: calc(10 * var(--grid-cell-size));
+}
+
+.row-label {
+    width: 30px;
+    height: var(--grid-cell-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-tech);
+    font-size: 0.85rem;
+    color: #8888aa;
+    font-weight: 700;
+}
+
+.board-grid {
+    display: grid;
+    grid-template-columns: repeat(10, var(--grid-cell-size));
+    grid-template-rows: repeat(10, var(--grid-cell-size));
+    border: 2px solid rgba(0, 243, 255, 0.4);
+    background: rgba(4, 3, 10, 0.7);
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.05);
+}
+
+.grid-radar {
+    border-color: rgba(189, 0, 255, 0.4);
+    box-shadow: 0 0 15px rgba(189, 0, 255, 0.05);
+}
+
+.grid-cell {
+    width: var(--grid-cell-size);
+    height: var(--grid-cell-size);
+    border: 1px solid rgba(0, 243, 255, 0.1);
+    position: relative;
+    cursor: crosshair;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.grid-radar .grid-cell {
+    border-color: rgba(189, 0, 255, 0.15);
+}
+
+/* 懸停效果 */
+.grid-cell:hover {
+    background-color: rgba(0, 243, 255, 0.15);
+    box-shadow: inset 0 0 8px rgba(0, 243, 255, 0.3);
+}
+
+.grid-radar .grid-cell:hover {
+    background-color: rgba(189, 0, 255, 0.15);
+    box-shadow: inset 0 0 8px rgba(189, 0, 255, 0.3);
+}
+
+/* 船隻在格子的視覺樣式 */
+.cell-ship {
+    background: rgba(0, 243, 255, 0.08);
+    position: relative;
+}
+
+/* 預覽擺放船隻的樣式 */
+.preview-valid {
+    background-color: rgba(57, 255, 20, 0.25) !important;
+    border-color: var(--neon-green) !important;
+    box-shadow: inset 0 0 8px rgba(57, 255, 20, 0.4);
+}
+
+.preview-invalid {
+    background-color: rgba(255, 0, 85, 0.25) !important;
+    border-color: var(--neon-magenta) !important;
+    box-shadow: inset 0 0 8px rgba(255, 0, 85, 0.4);
+}
+
+/* 船隻定位元件 - 用於在格子中精美顯示船身 SVG */
+.ship-segment {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.ship-segment svg {
+    width: 90%;
+    height: 90%;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+}
+
+/* 雷達地圖上，只有擊中才顯示船隻殘骸，否則隱藏 */
+.grid-radar .ship-segment {
+    display: none;
+}
+
+.grid-radar .cell-hit .ship-segment {
+    display: flex;
+    opacity: 0.6;
+    filter: grayscale(1) sepia(100%) hue-rotate(-50deg) saturate(3);
+}
+
+/* 不同船隻格子的色彩特效 */
+.ship-thor {
+    border: 1px dashed rgba(0, 243, 255, 0.3);
+    background: rgba(0, 243, 255, 0.08);
+}
+.ship-plague {
+    border: 1px dashed rgba(189, 0, 255, 0.3);
+    background: rgba(189, 0, 255, 0.08);
+}
+.ship-cactus {
+    border: 1px dashed rgba(57, 255, 20, 0.3);
+    background: rgba(57, 255, 20, 0.08);
+}
+.ship-banknote {
+    border: 1px dashed rgba(255, 230, 0, 0.3);
+    background: rgba(255, 230, 0, 0.08);
+}
+
+/* 射擊命中與未命中狀態 */
+.cell-hit {
+    background-color: rgba(255, 0, 85, 0.15) !important;
+    border-color: var(--neon-magenta) !important;
+    box-shadow: inset 0 0 10px rgba(255, 0, 85, 0.5);
+    cursor: not-allowed;
+}
+
+.cell-hit::after {
+    content: "✖";
+    color: var(--neon-magenta);
+    font-size: 1.4rem;
+    font-weight: 900;
+    position: absolute;
+    z-index: 3;
+    text-shadow: 0 0 8px var(--neon-magenta);
+    animation: bounceIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cell-miss {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    cursor: not-allowed;
+}
+
+.cell-miss::after {
+    content: "•";
+    color: #a0a0c0;
+    font-size: 1.8rem;
+    position: absolute;
+    z-index: 3;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    animation: fadeIn 0.4s ease;
+}
+
+/* 戰鬥動畫與晃動 */
+.board-grid.shake {
+    animation: gridShake 0.4s ease;
+}
+
+@keyframes gridShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px) rotate(-1deg); }
+    40%, 80% { transform: translateX(6px) rotate(1deg); }
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 戰術日誌區 */
+.log-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 180px;
+}
+
+.log-panel h3 {
+    font-size: 1rem;
+    color: var(--neon-cyan);
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+    padding-bottom: 5px;
+}
+
+.log-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 5px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* 自訂日誌捲軸 */
+.log-messages::-webkit-scrollbar {
+    width: 6px;
+}
+.log-messages::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+}
+.log-messages::-webkit-scrollbar-thumb {
+    background: rgba(0, 243, 255, 0.2);
+    border-radius: 3px;
+}
+.log-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 243, 255, 0.4);
+}
+
+.log-entry {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.02);
+}
+.log-entry.player-hit {
+    color: #ff3377;
+    border-left: 3px solid var(--neon-magenta);
+}
+.log-entry.player-miss {
+    color: #44ccff;
+    border-left: 3px solid var(--neon-cyan);
+}
+.log-entry.enemy-hit {
+    color: #ff9900;
+    border-left: 3px solid var(--neon-yellow);
+}
+.log-entry.enemy-miss {
+    color: #aaaaaa;
+    border-left: 3px solid #666;
+}
+.log-entry.system-msg {
+    color: var(--neon-green);
+    border-left: 3px solid var(--neon-green);
+}
+.log-entry.sink-msg {
+    color: #e500ff;
+    background: rgba(189, 0, 255, 0.08);
+    font-weight: 700;
+    border-left: 3px solid var(--neon-purple);
+    animation: flash 0.8s infinite alternate;
+}
+
+/* 全螢幕遮罩彈窗 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 3, 10, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-card {
+    width: 90%;
+    max-width: 450px;
+    background: rgba(20, 15, 40, 0.9);
+    border: 2px solid var(--neon-purple);
+    box-shadow: 0 0 30px rgba(189, 0, 255, 0.3), inset 0 0 15px rgba(189, 0, 255, 0.1);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    transform: scale(1);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.hidden .modal-card {
+    transform: scale(0.85);
+}
+
+.modal-card h2 {
+    font-family: var(--font-tech);
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-shadow: 0 0 10px var(--neon-purple);
+}
+
+.modal-body {
+    margin-bottom: 25px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #c0bfe0;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid rgba(0, 243, 255, 0.15);
+    border-radius: 50%;
+    border-top-color: var(--neon-cyan);
+    margin: 20px auto 0;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 浮動字幕懸浮層 */
+.subtitle-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 99;
+    overflow: hidden;
+}
+
+/* 「阿不是阿！」浮動字幕樣式 */
+.floating-subtitle {
+    position: absolute;
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-shadow: 
+        0 0 10px var(--neon-magenta),
+        0 0 20px var(--neon-magenta),
+        0 0 30px #000;
+    padding: 8px 18px;
+    background: rgba(255, 0, 85, 0.15);
+    border: 2px solid var(--neon-magenta);
+    border-radius: 8px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: subtitlePopUp 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    white-space: nowrap;
+}
+
+@keyframes subtitlePopUp {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6) rotate(-15deg);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -80px) scale(1.1) rotate(5deg);
+    }
+    30% {
+        transform: translate(-50%, -80px) scale(1.0) rotate(-3deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -180px) scale(0.9) rotate(-10deg);
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* RWD 響應式微調 */
+@media (max-width: 950px) {
+    .boards-container {
+        gap: 20px;
+    }
+    
+    .game-title {
+        font-size: 2.2rem;
+    }
+    
+    :root {
+        --grid-cell-size: 34px;
+    }
+}
+
+@media (max-width: 768px) {
+    .control-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .control-group {
+        justify-content: space-between;
+    }
+    
+    .btn-controls {
+        justify-content: center;
+    }
+}
+
+/* 傳接遊玩 (Pass & Play) 專用全黑隱私遮罩 */
+.modal-overlay.privacy-shield {
+    background: #000000 !important; /* 100% 不透明，防止對手偷看 */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.modal-overlay.privacy-shield .modal-card {
+    border-color: var(--neon-magenta);
+    box-shadow: 0 0 30px var(--neon-magenta), inset 0 0 15px rgba(255, 0, 85, 0.1);
+}
+
+.modal-overlay.privacy-shield h2 {
+    color: var(--neon-magenta);
+    text-shadow: 0 0 10px var(--neon-magenta);
+}
+
+/* Android / PWA carrying mode */
+html {
+    min-height: 100%;
+    touch-action: manipulation;
+}
+
+button,
+select,
+.ship-select-card,
+.grid-cell {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ship-preview img,
+.ship-custom-img {
+    display: block;
+}
+
+@media (hover: none) {
+    .card:hover,
+    .ship-select-card:hover,
+    .grid-cell:hover,
+    .grid-radar .grid-cell:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        min-height: 100dvh;
+        overscroll-behavior-y: contain;
+    }
+
+    .app-container {
+        width: 100%;
+        padding: max(12px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom));
+        gap: 14px;
+    }
+
+    header {
+        margin-top: 0;
+    }
+
+    .game-title {
+        letter-spacing: 1px;
+        line-height: 1.08;
+    }
+
+    .subtitle {
+        letter-spacing: 1px;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    .card {
+        border-radius: 8px;
+        padding: 14px;
+    }
+
+    .control-panel {
+        gap: 12px;
+    }
+
+    .control-group {
+        width: 100%;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .control-group label {
+        align-self: center;
+        white-space: nowrap;
+    }
+
+    select,
+    .btn {
+        min-height: 44px;
+        font-size: 1rem;
+    }
+
+    select {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .btn-controls {
+        display: grid;
+        grid-template-columns: 48px 48px 1fr;
+        width: 100%;
+    }
+
+    .btn-icon {
+        width: 48px;
+        padding: 8px;
+    }
+
+    .setup-panel .instructions {
+        font-size: 0.9rem;
+        line-height: 1.45;
+    }
+
+    .ship-yard {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .ship-select-card {
+        min-height: 132px;
+        padding: 10px;
+    }
+
+    .ship-info {
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .ship-name,
+    .ship-size {
+        overflow-wrap: anywhere;
+    }
+
+    .ship-preview {
+        height: 76px;
+    }
+
+    .setup-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .boards-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .board-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .board-header-labels,
+    .board-body {
+        width: max-content;
+        margin: 0 auto;
+    }
+
+    .grid-cell {
+        cursor: pointer;
+        transition: none;
+    }
+
+    .log-panel {
+        height: 150px;
+    }
+
+    .modal-card {
+        width: min(92vw, 430px);
+        max-height: 82dvh;
+        overflow-y: auto;
+        padding: 22px 18px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 430px) {
+    :root {
+        --grid-cell-size: 28px;
+    }
+
+    .app-container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .game-title {
+        font-size: 1.55rem;
+    }
+
+    .subtitle {
+        font-size: 0.82rem;
+    }
+
+    .card {
+        padding: 12px;
+    }
+
+    .ship-yard {
+        gap: 8px;
+    }
+
+    .ship-select-card {
+        min-height: 124px;
+        gap: 6px;
+    }
+
+    .ship-name {
+        font-size: 0.86rem;
+    }
+
+    .ship-size {
+        font-size: 0.68rem;
+    }
+
+    .ship-preview {
+        height: 68px;
+    }
+
+    .col-label {
+        height: 18px;
+        font-size: 0.68rem;
+    }
+
+    .row-label,
+    .empty-corner {
+        width: 18px;
+        font-size: 0.68rem;
+    }
+
+    .board-wrapper h3 {
+        font-size: 0.82rem;
+        letter-spacing: 1px;
+        text-align: center;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 360px) {
+    :root {
+        --grid-cell-size: 26px;
+    }
+}

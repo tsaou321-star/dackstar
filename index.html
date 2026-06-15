@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#080612">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Battleship">
+    <title>怪力亂神鳥嘴醫生 - 經典海戰棋</title>
+    <meta name="description" content="一款以怪力亂神鳥嘴醫生為主題的經典海戰棋遊戲。支援智慧 AI 對抗與單機雙人傳接遊玩 (Pass & Play) 模式，快來體驗獨特的艦艇棋盤與「阿不是阿」語音特效！">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 背景動態雷達網格與掃描線 -->
+    <div class="radar-bg"></div>
+    <div class="stars-bg"></div>
+    <div class="scanline"></div>
+
+    <div class="app-container">
+        <!-- 頂部標題區 -->
+        <header>
+            <h1 class="game-title" id="gameTitle">怪力亂神鳥嘴醫生</h1>
+            <p class="subtitle">—— 經典海戰棋變體版 ——</p>
+        </header>
+
+        <!-- 設定與控制面板 -->
+        <div class="control-panel card">
+            <div class="control-group">
+                <label for="modeSelect">遊戲模式：</label>
+                <select id="modeSelect">
+                    <option value="ai">單人對戰 (VS 電腦 AI)</option>
+                    <option value="pass">單機對戰 (傳接雙人玩)</option>
+                </select>
+            </div>
+            <div class="control-group btn-controls">
+                <button id="btnSoundToggle" class="btn btn-icon" title="切換音效">🔊</button>
+                <button id="btnVoiceToggle" class="btn btn-icon" title="切換「阿不是阿」語音">🗣️</button>
+                <button id="btnRestart" class="btn btn-danger">重新開始</button>
+            </div>
+        </div>
+
+        <!-- 遊戲主體區域 -->
+        <main class="game-area">
+            
+            <!-- 擺放階段：船隻庫與操作提示 -->
+            <section id="setupPanel" class="setup-panel card">
+                <h2 id="setupTitle">部署您的神魔編隊</h2>
+                <p class="instructions">請將下方的角色擺放到您的棋盤中。您可以點選角色後在棋盤上放置，或使用<b>隨機擺放</b>。擺放時可按 <b>[R] 鍵</b> 或點擊下方按鈕旋轉。</p>
+                
+                <div class="ship-yard" id="shipYard">
+                    <div class="ship-select-card" data-ship-id="thor" draggable="true">
+                        <div class="ship-info">
+                            <span class="ship-name">雷神</span>
+                            <span class="ship-size">6格 (2x3)</span>
+                        </div>
+                        <div class="ship-preview thor-preview"></div>
+                    </div>
+                    <div class="ship-select-card" data-ship-id="plague" draggable="true">
+                        <div class="ship-info">
+                            <span class="ship-name">鳥嘴醫生</span>
+                            <span class="ship-size">4格 (2x2)</span>
+                        </div>
+                        <div class="ship-preview plague-preview"></div>
+                    </div>
+                    <div class="ship-select-card" data-ship-id="cactus" draggable="true">
+                        <div class="ship-info">
+                            <span class="ship-name">仙人掌</span>
+                            <span class="ship-size">3格 (1x3)</span>
+                        </div>
+                        <div class="ship-preview cactus-preview"></div>
+                    </div>
+                    <div class="ship-select-card" data-ship-id="banknote" draggable="true">
+                        <div class="ship-info">
+                            <span class="ship-name">馬圖案鈔票</span>
+                            <span class="ship-size">3格 (1x3)</span>
+                        </div>
+                        <div class="ship-preview banknote-preview"></div>
+                    </div>
+                </div>
+
+                <div class="setup-actions">
+                    <button id="btnRotate" class="btn btn-secondary">旋轉選定船隻 (R)</button>
+                    <button id="btnRandomize" class="btn btn-secondary">隨機擺放</button>
+                    <button id="btnStartGame" class="btn btn-success" disabled>確認部署，開始戰鬥！</button>
+                </div>
+            </section>
+
+            <!-- 戰鬥對決區：雙方棋盤 -->
+            <section class="boards-container">
+                <!-- 玩家棋盤 -->
+                <div class="board-wrapper">
+                    <h3 id="playerBoardTitle">您的防禦區 (您的棋盤)</h3>
+                    <div class="board-header-labels">
+                        <div class="empty-corner"></div>
+                        <div class="col-labels" id="playerColLabels"></div>
+                    </div>
+                    <div class="board-body">
+                        <div class="row-labels" id="playerRowLabels"></div>
+                        <div class="board-grid" id="playerBoard"></div>
+                    </div>
+                </div>
+
+                <!-- 敵方/雷達棋盤 -->
+                <div class="board-wrapper">
+                    <h3 id="enemyBoardTitle">雷達掃描區 (敵方棋盤)</h3>
+                    <div class="board-header-labels">
+                        <div class="empty-corner"></div>
+                        <div class="col-labels" id="enemyColLabels"></div>
+                    </div>
+                    <div class="board-body">
+                        <div class="row-labels" id="enemyRowLabels"></div>
+                        <div class="board-grid grid-radar" id="enemyBoard"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 戰況日誌日誌 -->
+            <section class="log-panel card">
+                <h3>戰術日誌</h3>
+                <div class="log-messages" id="logMessages">
+                    <div class="log-entry system-msg">系統：歡迎來到《怪力亂神鳥嘴醫生》！請先部署您的編隊。</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 全螢幕遮罩彈窗：用於連線等待、隱私遮罩與勝負結算 -->
+    <div id="modalOverlay" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 id="modalTitle">載入中...</h2>
+            <div id="modalBody" class="modal-body">
+                <p id="modalMessage">正在載入遊戲，請稍候...</p>
+                <div class="loader" id="modalLoader"></div>
+            </div>
+            <div class="modal-actions">
+                <button id="btnModalClose" class="btn btn-secondary hidden">關閉</button>
+                <button id="btnModalAction" class="btn btn-primary hidden">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 字幕懸浮層：被擊中時顯示「阿不是阿」 -->
+    <div id="subtitleOverlay" class="subtitle-overlay"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

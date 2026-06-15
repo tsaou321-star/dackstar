@@ -1,0 +1,25 @@
+{
+  "name": "Battleship",
+  "short_name": "Battleship",
+  "description": "A mobile-friendly battleship game.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080612",
+  "theme_color": "#080612",
+  "icons": [
+    {
+      "src": "assets/images/thor.png.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/banknote.png.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
